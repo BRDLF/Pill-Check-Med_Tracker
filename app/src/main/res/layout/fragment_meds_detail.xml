@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="thisMed"
+            type="dev.brdlf.medtracker.model.Med" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        tools:context=".MedsDetailFragment">
+
+        <!-- TODO: Add style and features -->
+        <TextView
+            android:id="@+id/med_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edit_button"
+            android:layout_width="0dp"
+            android:textAlignment="textStart"
+            android:layout_height="wrap_content"
+            android:text="@{thisMed.name}"
+            tools:text="Example Med Name"
+            />
+
+        <TextView
+            android:maxHeight="400dp"
+            android:id="@+id/desc"
+            app:layout_constraintTop_toBottomOf="@+id/med_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/delete_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{thisMed.description}"
+            tools:text="@tools:sample/lorem/random"
+            />
+
+        <ImageButton
+            android:id="@+id/edit_button"
+            style="@style/SmallImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/med_name"
+            app:layout_constraintBottom_toTopOf="@id/delete_button"
+            app:srcCompat="@drawable/ic_baseline_edit_24"
+            />
+
+        <ImageButton
+            android:id="@+id/delete_button"
+            style="@style/SmallImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_baseline_delete_24"
+            app:layout_constraintTop_toBottomOf="@id/edit_button"
+            app:layout_constraintEnd_toEndOf="@id/edit_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

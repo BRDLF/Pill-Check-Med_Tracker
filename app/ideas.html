@@ -1,0 +1,48 @@
+
+<header>
+    <h1>Just some thoughts on how this app should work?</h1>
+    <h2>Potential Name: Pill Check</h2>
+
+    <p>It helps you keep track of your medications.</p>
+</header>
+
+<body>
+What medications are you on?
+When are you supposed to take them?
+& more importantly: When have you taken them?
+
+Sometimes it can be easy to forget if you've taken your meds today. And even with a pill organizer, you might forget <bold>when</bold> you've taken a pill.
+or you took a med and forget the second dose some few hours later.
+<br/>This app is to help you not only keep track of things, but help auto set notifications and reminders for that second dose.
+
+<br/>We are going to try following the KISS(keep it simple, silly) philosophy here. Sure I <e>could</e> add a mood tracker or calendar or whatever. Don't need to. separate app.
+
+<p>There's a lot of thinking too I have to do on settings. Just how much control should the user have. We are going to connect to the
+    fda drug api over @ https://open.fda.gov/apis/drug/drugsfda/  <br/>With the option for users to insert/create their own drug/meds to track. The model for a drug should/will be rather simple for that purpose
+</p>
+<ul> Drug Model
+    <li>Drug Name</li>
+    <li>Dosage</li>
+    <li>Route</li>
+    <li>Description (optional)</li>
+</ul>
+<p>
+    A separate model exists for alarms & trackers. Using Room to keep a foreign key to the associated med/drug it is tracking.
+<ul> Alarm Model
+    <li>id (auto generated)</li>
+    <li>Time (SimpleDateTime)</li>
+    <li>Reminder settings (Off/On)</li>
+</ul> The reminder settings model I haven't thought into too much detail yet. The idea is "after I mark i've taken the first dose, remind me in X hours for the next dose"
+
+<ol>Make Med
+    <li>Import from Database OR Manual Enter</li>
+    <li>How many times a day?</li>
+    <li>if N>1: Specific time or Specific Intervals</li>
+    <li>set TIME for ALARM_0 as "Initial Time"</li>
+    <li>if t: continue for each ALARM</li>
+    <li>if i: set interval</li>
+</ol>
+THE BIG Q: How to hold N Trackers.
+Complex "AlarmRules" in Med
+LinkedList of "Alarm"
+</body>

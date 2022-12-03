@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/MedsListFragment">
+
+    <fragment
+        android:id="@+id/MedsListFragment"
+        android:name="dev.brdlf.medtracker.MedsListFragment"
+        android:label="@string/meds_list_fragment_label"
+        tools:layout="@layout/fragment_meds_list">
+
+        <action
+            android:id="@+id/action_MedsListFragment_to_MedsDetailFragment"
+            app:destination="@id/MedsDetailFragment" />
+        <action
+            android:id="@+id/action_MedsListFragment_to_MedsAddFragment"
+            app:destination="@id/MedsAddFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MedsDetailFragment"
+        android:name="dev.brdlf.medtracker.MedsDetailFragment"
+        android:label="@string/meds_detail_fragment_label"
+        tools:layout="@layout/fragment_meds_detail">
+
+        <action
+            android:id="@+id/action_MedsDetailFragment_to_MedsListFragment"
+            app:destination="@id/MedsListFragment"
+            app:popUpTo="@id/MedsListFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_MedsDetailFragment_to_MedsAddFragment"
+            app:destination="@id/MedsAddFragment" />
+        <argument
+            android:name="item_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/MedsAddFragment"
+        android:name="dev.brdlf.medtracker.AddMedicationFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_meds_add">
+        <action
+            android:id="@+id/action_MedsAddFragment_to_MedsListFragment"
+            app:destination="@id/MedsListFragment"
+            app:popUpTo="@id/MedsListFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="item_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
+</navigation>

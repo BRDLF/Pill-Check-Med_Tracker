@@ -16,4 +16,12 @@
         <item>8</item>
         <item>9</item>
     </array>
+    <array name="repeat_rules">
+        <item>Does Not Repeat</item>
+        <item>Repeats Daily</item>
+        <item>Repeats Weekly</item>
+        <item>Repeats Monthly</item>
+        <item>Repeats Yearly</item>
+        <item>Custom</item>
+    </array>
 </resources>

@@ -1,30 +1,30 @@
 package dev.brdlf.medtracker
 
-import android.app.TimePickerDialog.OnTimeSetListener
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TimePicker
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.recyclerview.widget.DiffUtil
+import android.app.TimePickerDialog
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import dev.brdlf.medtracker.databinding.FragmentMedsAddBinding
 import dev.brdlf.medtracker.databinding.ViewAlarmBinding
-import dev.brdlf.medtracker.viewmodel.MedAddViewModel
-
-class AlarmsListAdapter : RecyclerView.Adapter<AlarmsListAdapter.AlarmViewHolder>() {
+class AlarmsListAdapter(private val sentListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit) : RecyclerView.Adapter<AlarmsListAdapter.AlarmViewHolder>() {
     private var size: Int = 1
 
-    class AlarmViewHolder(private val binding: ViewAlarmBinding) : RecyclerView.ViewHolder(binding.root), OnTimeSetListener {
-        override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-            binding.timeButton.text = "HH:mm".format(hourOfDay, minute)
+    //TODO Move to a ViewModel
+    private val alarms = mutableMapOf<Int, String>()
+    private val updateAlarms: (Int, String) -> Unit = {p, t -> alarms[p] = t}
+
+    class AlarmViewHolder(private val binding: ViewAlarmBinding) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
+
+        override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
+            "$p1:$p2".also { binding.timeButton.text = it }
         }
 
-        fun bind(clickListener: (Int) -> Unit) {
+        fun bind(clickListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit, onTextChangeListener: (Int, String) -> Unit) {
             binding.timeButton.setOnClickListener{
-                clickListener(adapterPosition)
+                clickListener(adapterPosition, this)
             }
+            binding.timeButton.doOnTextChanged { text, _, _, _ ->  onTextChangeListener(adapterPosition, text.toString())}
         }
     }
 
@@ -36,8 +36,8 @@ class AlarmsListAdapter : RecyclerView.Adapter<AlarmsListAdapter.AlarmViewHolder
         )
     }
 
-    //TODO set an OnClick to create a TimePicker and send to the view
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {
+        holder.bind(sentListener, updateAlarms)
     }
 
     //TODO change getItemCount to follow rules of viewModel
@@ -47,8 +47,12 @@ class AlarmsListAdapter : RecyclerView.Adapter<AlarmsListAdapter.AlarmViewHolder
         size = s.toIntOrNull() ?: 1
     }
 
-    //TODO implement function to return the string list to be converted into an alarmbuilder, thingy.
-    fun returnTimes(): List<String> {
-        return listOf<String>()
+    fun returnTimes(): String {
+        val sb = StringBuilder()
+        for (i in 0..size) {
+            sb.append(alarms[i] ?: continue)
+            sb.append(";")
+        }
+        return sb.toString()
     }
 }

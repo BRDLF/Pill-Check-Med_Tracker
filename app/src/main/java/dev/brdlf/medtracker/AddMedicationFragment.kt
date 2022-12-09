@@ -2,15 +2,12 @@ package dev.brdlf.medtracker
 
 import android.app.*
 import android.app.TimePickerDialog.OnTimeSetListener
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -24,22 +21,18 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import android.widget.AdapterView
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.children
-import androidx.databinding.BindingAdapter
 import androidx.fragment.app.DialogFragment
 import dev.brdlf.medtracker.databinding.FragmentMedsAddBinding
 import dev.brdlf.medtracker.model.Med
+import dev.brdlf.medtracker.viewmodel.DEBUG_TAG
 import dev.brdlf.medtracker.viewmodel.MedAddViewModel
 import dev.brdlf.medtracker.viewmodel.MedsListViewModel
 import dev.brdlf.medtracker.viewmodel.MedsListViewModelFactory
 import java.util.*
 
-const val CHANNEL_ID = "CHANNEL_ID_DEBUG_ONLY"
 
 class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
+
 
     private val navigationArgs: AddMedicationFragmentArgs by navArgs()
 
@@ -115,10 +108,11 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val alarmListener: (Int, OnTimeSetListener) -> Unit = {a, l -> TPF(l).show(parentFragmentManager, a.toString())}
 
-        binding.alarmsAdapter = AlarmsListAdapter(alarmListener)
+
         binding.vm = viewModel
+        //TODO THIS ISN'T MODIFYING THE LIST?
+        binding.alarmsAdapter = AlarmsListAdapter(alarmListener,sendUpToViewModel)
 
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -172,7 +166,7 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
             //TODO: Change Channel names
             val name = "Notif Channel"
             val desc = "Notif Channel Desc"
-            val channel = NotificationChannel(channelID, name, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            val channel = NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = desc
             }
             val notificationManager: NotificationManager =
@@ -183,13 +177,14 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private fun scheduleNotification() {
         val intent = Intent(requireContext(), MyReceiver::class.java)
         val title: String = binding.inputMedName.text.toString()
-        val message = binding.alarmsAdapter?.returnTimes() ?: "DEBUG, No AlarmsAdapter"
-        intent.putExtra(titleExtra, title)
-        intent.putExtra(messageExtra, message)
+        val message = viewModel.GFL()?: "No VM"
+        Log.d(DEBUG_TAG, "scheduling $title:$message")
+        intent.putExtra(TITLE_EXTRA, title)
+        intent.putExtra(MESSAGE_EXTRA, message)
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            notificationID,
+            NOTIFICATION_ID,
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -202,7 +197,14 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
             pendingIntent
         )
     }
-
+    private val alarmListener: (Int, OnTimeSetListener) -> Unit = { position, onTimeSetListener ->
+        TPF(onTimeSetListener).show(parentFragmentManager, position.toString())
+    }
+    private val sendUpToViewModel: (Int, String) -> Unit = {
+        i, str ->
+        Log.d(DEBUG_TAG, "Sending Up!")
+        viewModel.updateAt(i, str)
+    }
 }
 
 class TPF(private val lis: OnTimeSetListener): DialogFragment() {

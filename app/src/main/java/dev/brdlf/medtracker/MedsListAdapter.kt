@@ -30,7 +30,7 @@ class MedsListAdapter(private val onMedClicked: (Med) -> Unit) :
                 return (
                         oldItem.name == newItem.name &&
                         oldItem.description == newItem.description &&
-                        oldItem.trackers == newItem.trackers
+                        oldItem.alarms == newItem.alarms
                         )
             }
         }
@@ -43,7 +43,6 @@ class MedsListAdapter(private val onMedClicked: (Med) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: MedsViewHolder, position: Int) {
-        //TODO: implement onBindViewHolder
         val current = getItem(position)
         holder.itemView.setOnClickListener {
             onMedClicked(current)

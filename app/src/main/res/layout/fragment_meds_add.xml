@@ -175,7 +175,7 @@
                 android:adapter="@{alarmsAdapter}"
                 android:visibility="@{isTethered.checked ? View.GONE : View.VISIBLE}"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                tools:listitem="@layout/view_alarm"
+                tools:listitem="@layout/view_alarm_add"
                 tools:itemCount="3" />
 
             <androidx.appcompat.widget.LinearLayoutCompat

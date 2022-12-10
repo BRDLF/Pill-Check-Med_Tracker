@@ -40,6 +40,7 @@ class MedsDetailFragment : Fragment() {
         binding.thisMed = med
         binding.editButton.setOnClickListener { editMed() }
         binding.deleteButton.setOnClickListener{ deleteMed() }
+//        binding.alarms.text = med.alarmsFormat()
     }
 
     private fun deleteMed(){

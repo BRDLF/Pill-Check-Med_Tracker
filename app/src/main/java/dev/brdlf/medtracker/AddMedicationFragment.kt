@@ -55,7 +55,6 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentMedsAddBinding.inflate(inflater, container, false)
-        createNotificationChannel()
         return binding.root
     }
 
@@ -100,7 +99,6 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private fun bind(med: Med){
         binding.apply {
             inputMedName.setText(med.name)
-            cancelButton.setOnClickListener { scheduleNotification() }
             finishButton.setOnClickListener { updateMed() }
         }
     }
@@ -108,11 +106,9 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         binding.vm = viewModel
         //TODO THIS ISN'T MODIFYING THE LIST?
-        binding.alarmsAdapter = AlarmsListAdapter(alarmListener,sendUpToViewModel)
+        binding.alarmsAdapter = AlarmsListAdapter(alarmListener,updateVMAlarmList)
 
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -160,47 +156,10 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
         TODO("Not yet implemented")
     }
 
-    //TODO: Notification Cleanup
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //TODO: Change Channel names
-            val name = "Notif Channel"
-            val desc = "Notif Channel Desc"
-            val channel = NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = desc
-            }
-            val notificationManager: NotificationManager =
-                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-    private fun scheduleNotification() {
-        val intent = Intent(requireContext(), MyReceiver::class.java)
-        val title: String = binding.inputMedName.text.toString()
-        val message = viewModel.GFL()?: "No VM"
-        Log.d(DEBUG_TAG, "scheduling $title:$message")
-        intent.putExtra(TITLE_EXTRA, title)
-        intent.putExtra(MESSAGE_EXTRA, message)
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            NOTIFICATION_ID,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        alarmManager.set(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + 1000,
-            pendingIntent
-        )
-    }
     private val alarmListener: (Int, OnTimeSetListener) -> Unit = { position, onTimeSetListener ->
         TPF(onTimeSetListener).show(parentFragmentManager, position.toString())
     }
-    private val sendUpToViewModel: (Int, String) -> Unit = {
+    private val updateVMAlarmList: (Int, String) -> Unit = {
         i, str ->
         Log.d(DEBUG_TAG, "Sending Up!")
         viewModel.updateAt(i, str)

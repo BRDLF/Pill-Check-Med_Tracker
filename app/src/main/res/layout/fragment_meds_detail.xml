@@ -21,11 +21,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/edit_button"
+            app:layout_constraintBottom_toTopOf="@id/desc"
             android:layout_width="0dp"
             android:textAlignment="textStart"
             android:layout_height="wrap_content"
             android:text="@{thisMed.name}"
             tools:text="Example Med Name"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintVertical_bias="0"
             />
 
         <TextView
@@ -34,11 +37,24 @@
             app:layout_constraintTop_toBottomOf="@+id/med_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/delete_button"
+            app:layout_constraintBottom_toTopOf="@id/alarms"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{thisMed.description}"
             tools:text="@tools:sample/lorem/random"
             />
+
+        <TextView
+            android:id="@+id/alarms"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/desc"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/delete_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@{thisMed.alarmsFormat}"
+            tools:test="10:00\n12:00\n2:00"/>
 
         <ImageButton
             android:id="@+id/edit_button"

@@ -1,12 +1,14 @@
 package dev.brdlf.medtracker.viewmodel
 
 import androidx.lifecycle.*
+import dev.brdlf.medtracker.MedNotificationHandler
 import dev.brdlf.medtracker.data.MedDao
 import dev.brdlf.medtracker.model.Med
 import kotlinx.coroutines.launch
 
-class MedsListViewModel(private val medDao: MedDao) : ViewModel() {
-    // TODO: ViewModel cleanup. Adjust functions to account for new tracker mode
+class MedsListViewModel(private val medDao: MedDao, ) : ViewModel() {
+
+    private val notifier = MedNotificationHandler()
     val userMeds: LiveData<List<Med>> = medDao.getMeds().asLiveData()
 
     fun updateMed(itemId: Int, itemName: String, itemDesc: String, itemTrackers: String){
@@ -47,14 +49,14 @@ class MedsListViewModel(private val medDao: MedDao) : ViewModel() {
     }
 
     private fun getNewMedEntry(medName: String, medDesc: String, medTrackers: String): Med {
-        return Med(name = medName, description = medDesc, trackers = medTrackers)
+        return Med(name = medName, description = medDesc, alarms = medTrackers)
     }
     private fun getUpdatedMedEntry(medId: Int, medName: String, medDesc: String, medTrackers: String): Med {
         return Med(
             id = medId,
             name = medName,
             description = medDesc,
-            trackers = medTrackers
+            alarms = medTrackers
         )
     }
 }

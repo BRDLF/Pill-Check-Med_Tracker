@@ -24,6 +24,11 @@
         android:label="@string/meds_detail_fragment_label"
         tools:layout="@layout/fragment_meds_detail">
 
+        <argument
+            android:name="item_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+
         <action
             android:id="@+id/action_MedsDetailFragment_to_MedsListFragment"
             app:destination="@id/MedsListFragment"
@@ -32,21 +37,15 @@
         <action
             android:id="@+id/action_MedsDetailFragment_to_MedsAddFragment"
             app:destination="@id/MedsAddFragment" />
-        <argument
-            android:name="item_id"
-            android:defaultValue="-1"
-            app:argType="integer" />
+        <action
+            android:id="@+id/action_MedsDetailFragment_to_AlarmsAddFragment"
+            app:destination="@id/AlarmsAddFragment" />
     </fragment>
     <fragment
         android:id="@+id/MedsAddFragment"
         android:name="dev.brdlf.medtracker.AddMedicationFragment"
         android:label="{title}"
-        tools:layout="@layout/fragment_meds_add">
-        <action
-            android:id="@+id/action_MedsAddFragment_to_MedsListFragment"
-            app:destination="@id/MedsListFragment"
-            app:popUpTo="@id/MedsListFragment"
-            app:popUpToInclusive="true" />
+        tools:layout="@layout/fragment_add_meds">
         <argument
             android:name="title"
             app:argType="string" />
@@ -54,5 +53,37 @@
             android:name="item_id"
             android:defaultValue="-1"
             app:argType="integer" />
+
+        <action
+            android:id="@+id/action_MedsAddFragment_to_MedsListFragment"
+            app:destination="@id/MedsListFragment"
+            app:popUpTo="@id/MedsListFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_MedsAddFragment_to_AlarmsAddFragment"
+            app:destination="@id/AlarmsAddFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/AlarmsAddFragment"
+        android:name="dev.brdlf.medtracker.AddAlarmsFragment"
+        android:label="@string/alarm_text"
+        tools:layout="@layout/fragment_add_alarms"
+        >
+        <argument
+            android:name="item_id"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+        <action
+            android:id="@+id/action_AlarmsAddFragment_to_MedsAddFragment"
+            app:destination="@id/MedsAddFragment"
+            app:popUpTo="@id/MedsAddFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_AlarmsAddFragment_to_MedsDetailFragment"
+            app:destination="@id/MedsDetailFragment"
+            app:popUpTo="@id/MedsDetailFragment"
+            app:popUpToInclusive="true" />
+
     </fragment>
 </navigation>

@@ -10,16 +10,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dev.brdlf.medtracker.databinding.FragmentMedsDetailBinding
 import dev.brdlf.medtracker.model.Med
-import dev.brdlf.medtracker.viewmodel.MedsListViewModel
-import dev.brdlf.medtracker.viewmodel.MedsListViewModelFactory
+import dev.brdlf.medtracker.viewmodel.MedsViewModel
+import dev.brdlf.medtracker.viewmodel.MedsViewModelFactory
 
 class MedsDetailFragment : Fragment() {
 
     private val navigationArgs: MedsDetailFragmentArgs by navArgs()
     lateinit var med: Med
 
-    private val viewModel: MedsListViewModel by activityViewModels {
-        MedsListViewModelFactory(
+    private val viewModel: MedsViewModel by activityViewModels {
+        MedsViewModelFactory(
             (activity?.application as TrackerApplication).database.medDao()
         )
     }
@@ -40,7 +40,6 @@ class MedsDetailFragment : Fragment() {
         binding.thisMed = med
         binding.editButton.setOnClickListener { editMed() }
         binding.deleteButton.setOnClickListener{ deleteMed() }
-//        binding.alarms.text = med.alarmsFormat()
     }
 
     private fun deleteMed(){

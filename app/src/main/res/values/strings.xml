@@ -31,6 +31,4 @@
     <string name="med_name_hint">Name of medication</string>
     <string name="desc_add_med">Button to add a medication</string>
     <string name="alarm_text">Alarm</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

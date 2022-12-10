@@ -1,9 +1,8 @@
 package dev.brdlf.medtracker
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import dev.brdlf.medtracker.viewmodel.MedsListViewModel
+import dev.brdlf.medtracker.viewmodel.MedsViewModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.brdlf.medtracker.databinding.FragmentMedsListBinding
-import dev.brdlf.medtracker.viewmodel.MedsListViewModelFactory
+import dev.brdlf.medtracker.viewmodel.MedsViewModelFactory
 
 class MedsListFragment : Fragment() {
-    private val viewModel: MedsListViewModel by activityViewModels {
-        MedsListViewModelFactory(
+    private val viewModel: MedsViewModel by activityViewModels {
+        MedsViewModelFactory(
             (activity?.application as TrackerApplication).database.medDao()
         )
     }

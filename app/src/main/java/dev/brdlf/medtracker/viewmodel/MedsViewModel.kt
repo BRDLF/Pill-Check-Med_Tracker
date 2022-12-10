@@ -1,14 +1,12 @@
 package dev.brdlf.medtracker.viewmodel
 
 import androidx.lifecycle.*
-import dev.brdlf.medtracker.MedNotificationHandler
 import dev.brdlf.medtracker.data.MedDao
 import dev.brdlf.medtracker.model.Med
 import kotlinx.coroutines.launch
 
-class MedsListViewModel(private val medDao: MedDao, ) : ViewModel() {
+class MedsViewModel(private val medDao: MedDao, ) : ViewModel() {
 
-    private val notifier = MedNotificationHandler()
     val userMeds: LiveData<List<Med>> = medDao.getMeds().asLiveData()
 
     fun updateMed(itemId: Int, itemName: String, itemDesc: String, itemTrackers: String){
@@ -61,11 +59,11 @@ class MedsListViewModel(private val medDao: MedDao, ) : ViewModel() {
     }
 }
 
-class MedsListViewModelFactory(private val medDao: MedDao) : ViewModelProvider.Factory {
+class MedsViewModelFactory(private val medDao: MedDao) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MedsListViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(MedsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MedsListViewModel(medDao) as T
+            return MedsViewModel(medDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

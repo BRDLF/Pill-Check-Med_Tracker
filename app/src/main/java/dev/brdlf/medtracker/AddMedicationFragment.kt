@@ -2,12 +2,8 @@ package dev.brdlf.medtracker
 
 import android.app.*
 import android.app.TimePickerDialog.OnTimeSetListener
-import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.text.format.DateFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -22,27 +18,25 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import android.widget.AdapterView
 import androidx.fragment.app.DialogFragment
-import dev.brdlf.medtracker.databinding.FragmentMedsAddBinding
+import dev.brdlf.medtracker.databinding.FragmentAddMedsBinding
 import dev.brdlf.medtracker.model.Med
-import dev.brdlf.medtracker.viewmodel.DEBUG_TAG
-import dev.brdlf.medtracker.viewmodel.MedAddViewModel
-import dev.brdlf.medtracker.viewmodel.MedsListViewModel
-import dev.brdlf.medtracker.viewmodel.MedsListViewModelFactory
+import dev.brdlf.medtracker.viewmodel.*
 import java.util.*
 
 
 class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
-
     private val navigationArgs: AddMedicationFragmentArgs by navArgs()
 
-    private var _binding: FragmentMedsAddBinding? = null
+    private var _binding: FragmentAddMedsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MedAddViewModel by viewModels()
+    private val viewModel: MedBuilderViewModel by activityViewModels {
+        MedBuilderViewModelFactory()
+    }
 
-    private val lVM: MedsListViewModel by activityViewModels {
-        MedsListViewModelFactory(
+    private val lVM: MedsViewModel by activityViewModels {
+        MedsViewModelFactory(
             (activity?.application as TrackerApplication).database.medDao()
         )
     }
@@ -54,7 +48,7 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentMedsAddBinding.inflate(inflater, container, false)
+        _binding = FragmentAddMedsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -75,6 +69,8 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 "Test Description",
                 "Test Trackers",
             )
+            //change med to newly created med
+            //Update alarm for med
             returnToMedsList()
         }
     }
@@ -87,8 +83,14 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 "Test Description",
                 "Test Trackers",
             )
+            //change med to reflect updated med
+            //update alarm for med
             returnToMedsList()
         }
+    }
+
+    private fun toAlarms() {
+
     }
 
     private fun returnToMedsList() {
@@ -107,7 +109,6 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
-        //TODO THIS ISN'T MODIFYING THE LIST?
         binding.alarmsAdapter = AlarmsListAdapter(alarmListener,updateVMAlarmList)
 
         ArrayAdapter.createFromResource(
@@ -133,6 +134,12 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
         }
 
+        binding.alarmButton.setOnClickListener {
+            val action = AddMedicationFragmentDirections.actionMedsAddFragmentToAlarmsAddFragment(
+                id
+            )
+            findNavController().navigate(action)
+        }
         binding.cancelButton.setOnClickListener {
             findNavController().navigateUp()
         }

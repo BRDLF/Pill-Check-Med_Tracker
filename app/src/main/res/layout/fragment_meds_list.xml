@@ -6,7 +6,7 @@
     <data>
         <variable
             name="medsList"
-            type="dev.brdlf.medtracker.viewmodel.MedsListViewModel" />
+            type="dev.brdlf.medtracker.viewmodel.MedsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

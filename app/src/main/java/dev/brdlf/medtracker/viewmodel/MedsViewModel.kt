@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 class MedsViewModel(private val medDao: MedDao, ) : ViewModel() {
 
     val userMeds: LiveData<List<Med>> = medDao.getMeds().asLiveData()
+    lateinit var selectedMed: LiveData<Med>
 
     fun updateMed(itemId: Int, itemName: String, itemDesc: String, itemTrackers: String){
         val updatedMed = getUpdatedMedEntry(itemId, itemName, itemDesc, itemTrackers)

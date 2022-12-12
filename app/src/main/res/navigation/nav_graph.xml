@@ -39,7 +39,8 @@
             app:destination="@id/MedsAddFragment" />
         <action
             android:id="@+id/action_MedsDetailFragment_to_AlarmsAddFragment"
-            app:destination="@id/AlarmsAddFragment" />
+            app:destination="@id/AlarmsAddFragment" >
+        </action>
     </fragment>
     <fragment
         android:id="@+id/MedsAddFragment"
@@ -62,6 +63,9 @@
         <action
             android:id="@+id/action_MedsAddFragment_to_AlarmsAddFragment"
             app:destination="@id/AlarmsAddFragment" />
+        <action
+            android:id="@+id/action_MedsAddFragment_to_MedsDetailFragment"
+            app:destination="@id/MedsDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/AlarmsAddFragment"
@@ -73,6 +77,11 @@
             android:name="item_id"
             app:argType="integer"
             android:defaultValue="-1" />
+        <argument
+            android:name="item_name"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
 
         <action
             android:id="@+id/action_AlarmsAddFragment_to_MedsAddFragment"

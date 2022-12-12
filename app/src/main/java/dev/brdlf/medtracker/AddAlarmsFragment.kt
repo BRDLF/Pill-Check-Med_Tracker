@@ -10,13 +10,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dev.brdlf.medtracker.databinding.FragmentAddAlarmsBinding
-import dev.brdlf.medtracker.viewmodel.DEBUG_TAG
-import dev.brdlf.medtracker.viewmodel.MedBuilderViewModel
-import dev.brdlf.medtracker.viewmodel.MedBuilderViewModelFactory
+import dev.brdlf.medtracker.viewmodel.*
 
 class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
@@ -26,6 +23,11 @@ class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private val viewModel: MedBuilderViewModel by activityViewModels {
         MedBuilderViewModelFactory()
+    }
+    private val lVM: MedsViewModel by activityViewModels {
+        MedsViewModelFactory(
+            (activity?.application as TrackerApplication).database.medDao()
+        )
     }
 
     override fun onCreateView(
@@ -42,7 +44,6 @@ class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         binding.vm = viewModel
         binding.alarmsAdapter = AlarmsListAdapter(alarmListener, updateVMAlarmList)
-        binding.title.text = viewModel.medName.value
 
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -54,38 +55,27 @@ class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
             binding.frequencyUnit.onItemSelectedListener = this
         }
 
-        val id = navigationArgs.itemId
-        if (id > 0) {
-//            lVM.retrieveMed(id).observe(this.viewLifecycleOwner) { selectedItem ->
-//                med = selectedItem
-//            }
-            binding.finishButton.setOnClickListener {
-                editMed()
-            }
+        val medName: String? = navigationArgs.itemName
+        val itemId = navigationArgs.itemId
+        Log.d(DEBUG_TAG, "$itemId $medName")
+        if (medName != null) {
+            binding.medName.text = if (medName.isEmpty()) "A Med with no name" else navigationArgs.itemName
+            val newTitle = if (itemId > 0) getString(R.string.edit_fragment_title) else getString(R.string.meds_add_fragment_label)
+            binding.finishButton.setOnClickListener { returnToAdd(newTitle) }
         } else {
-            binding.finishButton.setOnClickListener {
-                addNewMed()
+            lVM.retrieveMed(itemId).observe(this.viewLifecycleOwner) {
+                binding.medName.text = it.name
             }
+            binding.finishButton.setOnClickListener { returnToDetails() }
         }
-
         viewModel.alarmCount.observe(this.viewLifecycleOwner) {
             binding.alarmsAdapter?.setSize(it)
         }
     }
 
-    private fun addNewMed() {
-//        Does nothing, just returns to add, silly code! can remove
-        returnToAdd()
-    }
-    private fun editMed() {
-//        ?MedVM updateMed(med)
-//        this is when the alarmList needs to be converted to string and sent to the med
-        returnToDetails()
-    }
-
-    private fun returnToAdd() {
+    private fun returnToAdd(newTitle: String) {
         val action = AddAlarmsFragmentDirections.actionAlarmsAddFragmentToMedsAddFragment(
-            getString(R.string.meds_add_fragment_label),
+            newTitle,
             navigationArgs.itemId)
         findNavController().navigate(action)
     }
@@ -99,7 +89,7 @@ class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
         viewModel.alarmCount.value = p0?.getItemAtPosition(p2).toString()
     }
     override fun onNothingSelected(p0: AdapterView<*>?) {
-        TODO("Not yet implemented")
+        Log.d(DEBUG_TAG, "onNothingSelected in addAlarmsFragment")
     }
 
     private val alarmListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit = { position, onTimeSetListener ->

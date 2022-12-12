@@ -40,11 +40,17 @@ class MedsDetailFragment : Fragment() {
         binding.thisMed = med
         binding.editButton.setOnClickListener { editMed() }
         binding.deleteButton.setOnClickListener{ deleteMed() }
+        binding.alarmButton.setOnClickListener { editAlarms() }
     }
 
     private fun deleteMed(){
         viewModel.deleteMed(med)
         val action = MedsDetailFragmentDirections.actionMedsDetailFragmentToMedsListFragment()
+        this.findNavController().navigate(action)
+    }
+
+    private fun editAlarms() {
+        val action = MedsDetailFragmentDirections.actionMedsDetailFragmentToAlarmsAddFragment(itemId = med.id)
         this.findNavController().navigate(action)
     }
 

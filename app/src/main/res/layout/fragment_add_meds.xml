@@ -136,7 +136,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/section_hide"
+            app:layout_constraintBottom_toTopOf="@id/section_buttons"
             app:layout_constraintTop_toBottomOf="@id/section_meds"
             tools:layout_editor_absoluteX="16dp">
 
@@ -164,29 +164,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="click this to modify alarms" />
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="64dp"
-                    android:text="Rules"
-                    android:textAlignment="textStart" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/is_Tethered"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:showText="true"
-                    android:textOff="@string/atTime"
-                    android:textOn="@string/atInterval"
-                    android:visibility="visible" /><!--android:checked="@={vM.isTethered}"-->
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
             <!--TODO: Create layout for recyclerView-->
             <!--        Specifically, I need to have it so that the recyclerview height adapts to the number of items.-->
             <!--        While not taking up more space than it needs.-->
@@ -204,98 +181,6 @@
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 tools:itemCount="3"
                 tools:listitem="@layout/view_alarm_add" />
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                >
-<!--                android:visibility="@{isTethered.checked ? View.VISIBLE : View.GONE}"-->
-
-                <TextView
-                    android:id="@+id/interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="64dp"
-                    android:text="FIRST AT" />
-
-                <Button
-                    style="@style/Widget.MaterialComponents.TimePicker.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="HH:mm"
-                    android:textColor="#757575" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                >
-<!--                android:visibility="@{isTethered.checked ? View.VISIBLE : View.GONE}"-->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="64dp"
-                    android:text="THEN AFTER EVERY" />
-
-                <Button
-                    style="@style/Widget.MaterialComponents.TimePicker.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="HH:mm"
-                    android:textColor="#757575" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/section_hide"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/section_alarms"
-            app:layout_constraintBottom_toTopOf="@id/section_freq"
-            >
-            <!--TODO: Add reactive visibility-->
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <!--Freq-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/section_freq"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@id/section_hide"
-            app:layout_constraintBottom_toTopOf="@id/section_buttons"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Repeating every"/>
-
-            <!--                TODO: Function that fixes input-->
-            <EditText
-                android:id="@+id/repeat_every"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:maxLength="2"
-                android:minWidth="48dp"
-                android:text=""
-                />
-
-            <!--TODO: Have spinner text be plural-->
-            <Spinner
-                android:id="@+id/frequency_unit"
-                android:contentDescription="frequency of dose"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!--Buttons-->
@@ -303,7 +188,7 @@
             android:id="@+id/section_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/section_freq"
+            app:layout_constraintTop_toBottomOf="@id/section_alarms"
             app:layout_constraintBottom_toBottomOf="parent"
             android:orientation="vertical">
 
@@ -313,12 +198,12 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
             <Button
                 android:id="@+id/finish_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Finish" />
+                android:text="@string/create_medication" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

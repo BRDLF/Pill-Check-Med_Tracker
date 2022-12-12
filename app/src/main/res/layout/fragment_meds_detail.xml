@@ -76,5 +76,13 @@
             app:layout_constraintTop_toBottomOf="@id/edit_button"
             app:layout_constraintEnd_toEndOf="@id/edit_button" />
 
+        <Button
+            android:id="@+id/alarm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/alarm_text"
+            app:layout_constraintTop_toBottomOf="@id/alarms"
+            app:layout_constraintStart_toStartOf="@id/alarms" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

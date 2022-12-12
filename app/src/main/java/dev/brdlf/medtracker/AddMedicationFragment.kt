@@ -43,10 +43,8 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private lateinit var med: Med
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         _binding = FragmentAddMedsBinding.inflate(inflater, container, false)
         return binding.root
@@ -58,7 +56,7 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
         return lVM.isEntryValid(
             binding.inputMedName.text.toString(),
             "Test Description",
-            "Test Trackers",
+            "EX;10:00;12:00;2:15;",
         )
     }
     //TODO Change Test Text
@@ -67,10 +65,8 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
             lVM.addMed(
                 binding.inputMedName.text.toString(),
                 "Test Description",
-                "Test Trackers",
+                "EX;10:00;12:00;2:15;",
             )
-            //change med to newly created med
-            //Update alarm for med
             returnToMedsList()
         }
     }
@@ -81,25 +77,31 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 this.navigationArgs.itemId,
                 this.binding.inputMedName.text.toString(),
                 "Test Description",
-                "Test Trackers",
+                "EX;10:00;12:00;2:15;",
             )
-            //change med to reflect updated med
-            //update alarm for med
-            returnToMedsList()
+            returnToDetailsList()
         }
     }
 
     private fun toAlarms() {
-
+        val action = AddMedicationFragmentDirections.actionMedsAddFragmentToAlarmsAddFragment(itemId = navigationArgs.itemId, itemName = binding.inputMedName.text?.toString() ?: "")
+        this.findNavController().navigate((action))
     }
 
     private fun returnToMedsList() {
         val action = AddMedicationFragmentDirections.actionMedsAddFragmentToMedsListFragment()
         findNavController().navigate(action)
     }
+    private fun returnToDetailsList() {
+        val action = AddMedicationFragmentDirections.actionMedsAddFragmentToMedsDetailFragment(
+            itemId = navigationArgs.itemId
+        )
+        findNavController().navigate(action)
+    }
 
     private fun bind(med: Med){
         binding.apply {
+            finishButton.text = getString(R.string.save_changes)
             inputMedName.setText(med.name)
             finishButton.setOnClickListener { updateMed() }
         }
@@ -110,17 +112,6 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         binding.vm = viewModel
         binding.alarmsAdapter = AlarmsListAdapter(alarmListener,updateVMAlarmList)
-
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.durations,
-            android.R.layout.simple_spinner_item
-        ).also { spinAdapter ->
-            spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.frequencyUnit.adapter = spinAdapter
-            binding.frequencyUnit.onItemSelectedListener = this
-        }
-
 
         val id = navigationArgs.itemId
         if (id > 0) {
@@ -135,10 +126,7 @@ class AddMedicationFragment : Fragment(), AdapterView.OnItemSelectedListener {
         }
 
         binding.alarmButton.setOnClickListener {
-            val action = AddMedicationFragmentDirections.actionMedsAddFragmentToAlarmsAddFragment(
-                id
-            )
-            findNavController().navigate(action)
+            toAlarms()
         }
         binding.cancelButton.setOnClickListener {
             findNavController().navigateUp()

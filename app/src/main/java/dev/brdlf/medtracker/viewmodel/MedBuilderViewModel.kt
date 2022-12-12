@@ -12,14 +12,24 @@ class MedBuilderViewModel : ViewModel() {
 
     val alarmCount: MutableLiveData<String> = MutableLiveData<String>("1")
 
-//    val isTethered: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-
     private val alarmData: MutableLiveData<List<String>> = MutableLiveData(listOf())
-
+    private val alarmString: MutableLiveData<String> = MutableLiveData<String>()
 
     fun getAlarmList(): String {
         Log.d(DEBUG_TAG, "Sending an alarmList that looks like: ${alarmData.value}")
         return alarmData.value?.toString()?: "alarmList No Value"
+    }
+
+    fun setAll(s: String, l: List<String>) {
+        medName.value = s
+        alarmData.value = l
+    }
+
+    fun newMed() {
+        medName.value = "Enter Med Name"
+        alarmCount.value = "1"
+        alarmData.value = listOf("")
+        alarmString.value = "EX;"
     }
 
     fun updateAt(index: Int, s: String) {

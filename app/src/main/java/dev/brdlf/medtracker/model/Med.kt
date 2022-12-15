@@ -14,10 +14,8 @@ data class Med(
     fun alarmsFormat(): String {
 //        return alarms.replace(";", "\n")
         val testString = "EX;10:00;12:00;2:00"
-        val split = testString.split(";")
-        when (split[0]) {
-            "EX" -> return split.drop(1).joinToString("\n")
-        }
-        return "Test Alarm\nTest Alarm 2"
+        val split = alarms.split(";")
+        return split.joinToString("\n")
+//        return "Test Alarm\nTest Alarm 2"
     }
 }

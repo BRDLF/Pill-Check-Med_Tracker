@@ -53,7 +53,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/delete_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:text="@{thisMed.alarmsFormat}"
+            android:text="@{thisMed.alarmsFormat()}"
             tools:test="10:00\n12:00\n2:00"/>
 
         <ImageButton

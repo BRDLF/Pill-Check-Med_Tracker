@@ -7,18 +7,11 @@
         <variable
             name="vM"
             type="dev.brdlf.medtracker.viewmodel.MedBuilderViewModel" />
-        <variable
-            name="alarmsAdapter"
-            type="dev.brdlf.medtracker.AlarmsListAdapter" />
-        <variable
-            name="alarmCount"
-            type="String" />
 
         <import type="android.view.View"/>
     </data>
     <!--TODO: Make pretty-->
     <!--TODO: Make style for layout-->
-    <!--TODO: Remove hardcoded spacing and use weights-->
     <androidx.constraintlayout.widget.ConstraintLayout
 
         android:paddingTop="16dp"
@@ -55,7 +48,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/input_med_name_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minWidth="96dp"
@@ -63,13 +55,13 @@
 
                 <EditText
                     android:id="@+id/input_med_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:maxLength="50"
                     android:maxLines="2"
                     android:text="@={vM.medName}"
-                    android:hint="@string/med_name_hint"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -79,8 +71,10 @@
                 android:text="PLEASE ADD A DESCRIPTION"/>
 
             <EditText
+                android:id="@+id/input_med_desc"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="@={vM.medDesc}"/>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -95,37 +89,6 @@
                     android:showText="true"
                     android:text="Multiple times a day"
                     android:visibility="visible" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/row_freq"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <!--                android:visibility="@{multiDay.checked ? View.VISIBLE : View.GONE}"-->
-                <TextView
-                    android:id="@+id/per_day"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="96dp"
-                    android:text="Doses per day" />
-
-                <EditText
-                    android:id="@+id/per_day_doses"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:digits="123456789"
-                    android:maxLength="1"
-                    android:minWidth="48dp"
-                    android:text="@{alarmCount}"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="dose(s) per day"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -153,9 +116,10 @@
                 android:layout_height="1dp" />
 
             <TextView
+                android:id="@+id/alarmDataText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="128dp"
+                android:minHeight="32dp"
                 tools:text="This is where the alarms are going to go, formatted"
                 />
 
@@ -164,23 +128,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="click this to modify alarms" />
-            <!--TODO: Create layout for recyclerView-->
-            <!--        Specifically, I need to have it so that the recyclerview height adapts to the number of items.-->
-            <!--        While not taking up more space than it needs.-->
-            <!--        and not going past the screensize.-->
-            <!--        I should be able to do this with weights.-->
-
-<!--            android:visibility="@{isTethered.checked ? View.GONE : View.VISIBLE}"-->
-            <androidx.recyclerview.widget.RecyclerView
-                android:visibility="gone"
-                android:id="@+id/alarms_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:adapter="@{alarmsAdapter}"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                tools:itemCount="3"
-                tools:listitem="@layout/view_alarm_add" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!--Buttons-->

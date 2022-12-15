@@ -1,44 +1,73 @@
 package dev.brdlf.medtracker.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 const val DEBUG_TAG = "DEBUG TAG"
 
+
 class MedBuilderViewModel : ViewModel() {
     val medName: MutableLiveData<String> = MutableLiveData<String>()
+    val medDesc: MutableLiveData<String> = MutableLiveData<String>()
 
-    val alarmCount: MutableLiveData<String> = MutableLiveData<String>("1")
-
-    private val alarmData: MutableLiveData<List<String>> = MutableLiveData(listOf())
-    private val alarmString: MutableLiveData<String> = MutableLiveData<String>()
+    private val _alarmData: MutableLiveData<List<String>> = MutableLiveData(listOf<String>().sortedBy{ it.split(":").first().toIntOrNull() })
+    val alarmData: LiveData<List<String>> get() = _alarmData
 
     fun getAlarmList(): String {
         Log.d(DEBUG_TAG, "Sending an alarmList that looks like: ${alarmData.value}")
-        return alarmData.value?.toString()?: "alarmList No Value"
+        return alarmData.value?.joinToString(";")?: "alarmList No Value"
     }
 
-    fun setAll(s: String, l: List<String>) {
-        medName.value = s
-        alarmData.value = l
+    fun clearVM(){
+        medName.value = ""
+        medDesc.value = ""
+        _alarmData.value = mutableListOf()
     }
 
-    fun newMed() {
-        medName.value = "Enter Med Name"
-        alarmCount.value = "1"
-        alarmData.value = listOf("")
-        alarmString.value = "EX;"
+    //Translate entire data set to/from string
+    fun setAlarmDataFromString(source: String) {
+        val sortedSource = source.split(";").filterNot{ it.isEmpty() }
+        Log.d(DEBUG_TAG, "In setAlarmFromString, sortedSorce is $sortedSource")
+        setAlarmData(sortedSource)
     }
-
-    fun updateAt(index: Int, s: String) {
+    private fun setAlarmData(toAdd :List<String>) {
+        Log.d(DEBUG_TAG, "in setAlarmData, adding $toAdd to ${_alarmData.value}")
+        _alarmData.value = toAdd
+        Log.d(DEBUG_TAG, "in setAlarmData, alarmData is now ${_alarmData.value}")
+    }
+    fun alarmSetToString(): String {
+        return getSortedSet().joinToString(";")
+    }
+    private fun getSortedSet(): List<String> {
+        return alarmData.value?: listOf("ERROR")
+    }
+    //Edit Individual Data
+    fun addToAlarms(insert: String): Boolean{
+        Log.d(DEBUG_TAG, "addToAlarms: $insert")
+        Log.d(DEBUG_TAG, "Before: ${_alarmData.value} & ${alarmData.value}")
+        _alarmData.value = alarmData.value?.plus(insert)
+//        _alarmData.value?.add(insert)?: Log.d(DEBUG_TAG, "Failed")
+        Log.d(DEBUG_TAG, "After: ${_alarmData.value} & ${alarmData.value}")
+        return true
+    }
+    fun updateAt(index: Int, new: String) {
         Log.d(DEBUG_TAG, "Running UpdateAt")
-        val newSize = maxOf(alarmData.value?.size?: -1, index + 1)
-        val mL = MutableList<String>(newSize){""}
-        alarmData.value?.forEachIndexed{ oldIndex, oldString -> mL[oldIndex] = oldString }
-        mL[index] = s
-        alarmData.value = mL
+        _alarmData.value = alarmData.value?.mapIndexed{ i, original -> if (i == index) new else original }
+//        _alarmData.value?.set(index, s)?: Log.d(DEBUG_TAG, "Couldn't update at index $index")
+    }
+    fun removeFromAlarms(str: String) {
+        _alarmData.value = alarmData.value?.minus(str)
+//        alarmData.value?.remove(str)?: Log.d(DEBUG_TAG, "Couldn't remove $str")
+    }
+    fun removeAlarmAt(index: Int, str: String) {
+        if (alarmData.value?.get(index) == str) {
+            Log.d(DEBUG_TAG, "Removing $str at $index")
+            _alarmData.value = alarmData.value?.filterIndexed{i, _ -> i != index}
+        }
+        else Log.d(DEBUG_TAG, "Unable to remove alarm, $str was not at $index")
     }
 }
 

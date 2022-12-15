@@ -5,48 +5,57 @@ import android.view.ViewGroup
 import android.widget.TimePicker
 import android.app.TimePickerDialog
 import android.util.Log
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dev.brdlf.medtracker.databinding.ViewAlarmAddBinding
 import dev.brdlf.medtracker.viewmodel.DEBUG_TAG
 
-//TODO convert this to a DiffUtil and track from a viewModel
-class AlarmsListAdapter(private val sentListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit, private val sendUpToViewModel: (Int, String) -> Unit) :
-    RecyclerView.Adapter<AlarmsListAdapter.AlarmViewHolder>() {
-    private var size: Int = 1
+class AlarmsListAdapter(private val timePickingMachine: (Int, TimePickerDialog.OnTimeSetListener) -> Unit,
+                        private val bigListener: (Int, String, Int) -> Unit) :
+    ListAdapter<String, AlarmsListAdapter.AlarmViewHolder>(DiffCallback) {
 
-    class AlarmViewHolder(private val binding: ViewAlarmAddBinding, private val sendUpToViewModel: (Int, String) -> Unit) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
+    class AlarmViewHolder(private val binding: ViewAlarmAddBinding, private val bigListener: (Int, String, Int) -> Unit) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
 
         override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
             String.format("%2d:%02d", p1, p2).also {
                 Log.d(DEBUG_TAG, "onTimeSet $it")
                 binding.timeButton.text = it
-                sendUpToViewModel(adapterPosition, it)
+                bigListener(adapterPosition, it, UPDATE)
             }
         }
 
-        fun bind(clickListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit, ) {
-            binding.timeButton.setOnClickListener{
+        fun bind(alarmString: String, clickListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit, ) {
+            binding.timeButton.text = alarmString
+            binding.editButton.setOnClickListener{
                 clickListener(adapterPosition, this)
+            }
+            binding.deleteButton.setOnClickListener {
+                bigListener(adapterPosition, binding.timeButton.text.toString(), DELETE)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmViewHolder {
         return AlarmViewHolder(
-            ViewAlarmAddBinding.inflate(
-                LayoutInflater.from(parent.context)
-            ), sendUpToViewModel
-        )
+            ViewAlarmAddBinding.inflate(LayoutInflater.from(parent.context)),
+            bigListener)
     }
 
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {
-        holder.bind(sentListener)
+        val current = getItem(position)
+        holder.bind(current, timePickingMachine)
     }
 
-    //TODO change getItemCount to follow rules of viewModel
-    override fun getItemCount(): Int = size
+    companion object {
+        private val DiffCallback = object : DiffUtil.ItemCallback<String>() {
+            override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+                return oldItem === newItem
+            }
 
-    fun setSize(s: String) {
-        size = s.toIntOrNull() ?: 1
+            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

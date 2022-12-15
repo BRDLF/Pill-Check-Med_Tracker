@@ -54,6 +54,10 @@
             android:name="item_id"
             android:defaultValue="-1"
             app:argType="integer" />
+        <argument
+            android:name="external"
+            android:defaultValue="true"
+            app:argType="boolean" />
 
         <action
             android:id="@+id/action_MedsAddFragment_to_MedsListFragment"
@@ -62,10 +66,14 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_MedsAddFragment_to_AlarmsAddFragment"
-            app:destination="@id/AlarmsAddFragment" />
+            app:destination="@id/AlarmsAddFragment"
+            app:popUpTo="@id/AlarmsAddFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_MedsAddFragment_to_MedsDetailFragment"
-            app:destination="@id/MedsDetailFragment" />
+            app:destination="@id/MedsDetailFragment"
+            app:popUpTo="@id/MedsDetailFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/AlarmsAddFragment"
@@ -82,6 +90,10 @@
             app:argType="string"
             android:defaultValue="@null"
             app:nullable="true" />
+        <argument
+            android:name="external"
+            android:defaultValue="true"
+            app:argType="boolean" />
 
         <action
             android:id="@+id/action_AlarmsAddFragment_to_MedsAddFragment"

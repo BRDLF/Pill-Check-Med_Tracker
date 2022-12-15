@@ -1,103 +1,182 @@
 package dev.brdlf.medtracker
 
+import android.app.Dialog
 import android.app.TimePickerDialog
+import android.app.TimePickerDialog.OnTimeSetListener
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.TimePicker
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dev.brdlf.medtracker.databinding.FragmentAddAlarmsBinding
+import dev.brdlf.medtracker.model.Med
 import dev.brdlf.medtracker.viewmodel.*
+import java.util.*
 
-class AddAlarmsFragment : Fragment(), AdapterView.OnItemSelectedListener {
+const val UPDATE = 2
+const val DELETE = 4
+
+class AddAlarmsFragment : Fragment(), OnTimeSetListener {
 
     private val navigationArgs: AddAlarmsFragmentArgs by navArgs()
     private var _binding: FragmentAddAlarmsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MedBuilderViewModel by activityViewModels {
-        MedBuilderViewModelFactory()
-    }
-    private val lVM: MedsViewModel by activityViewModels {
+    private val builderViewModel: MedBuilderViewModel by activityViewModels{MedBuilderViewModelFactory()}
+    private val totalViewModel: MedsViewModel by activityViewModels {
         MedsViewModelFactory(
             (activity?.application as TrackerApplication).database.medDao()
         )
     }
+    private lateinit var med: Med
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    private fun bind(med: Med){
+        Log.d(DEBUG_TAG, "Binding")
+            binding.medName.text = med.name
+            binding.vm?.medDesc?.value = med.description
+            binding.vm?.setAlarmDataFromString(med.alarms)
+        val mn = binding.vm?.medName?.value
+        Log.d(DEBUG_TAG, "medName set to $mn")
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentAddAlarmsBinding.inflate(inflater, container, false)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.vm = viewModel
-        binding.alarmsAdapter = AlarmsListAdapter(alarmListener, updateVMAlarmList)
+        binding.vm = builderViewModel
 
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.durations,
-            android.R.layout.simple_spinner_item
-        ).also { spinAdapter ->
-            spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.frequencyUnit.adapter = spinAdapter
-            binding.frequencyUnit.onItemSelectedListener = this
-        }
+        //SETTING RECYCLERVIEW (alarmAdapter
+        val alarmAdapter = AlarmsListAdapter(timePickerMachine, sendToVM)
+        binding.alarmsAdapter = alarmAdapter
 
-        val medName: String? = navigationArgs.itemName
+        //SPINNER ADAPTER SETUP
+//        ArrayAdapter.createFromResource( requireContext(), R.array.durations, android.R.layout.simple_spinner_item)
+//            .also { spinAdapter ->
+//            spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            binding.frequencyUnit.adapter = spinAdapter
+//            binding.frequencyUnit.onItemSelectedListener = this
+//        }
+
+        //IF EXTERNAL
+        //  LOAD MED from ID
+        //      set name, desc from med
+        //      set alarms from med
+        //  SET onClickListener toDetails
+        //
+        //IF INTERNAL
+        //  Inherit name, desc, alarms from VM
+        //  Set onClickListener toAdd
+
+        //HANDLING SOURCE ACTION
+//        val medName: String? = navigationArgs.itemName
         val itemId = navigationArgs.itemId
-        Log.d(DEBUG_TAG, "$itemId $medName")
-        if (medName != null) {
-            binding.medName.text = if (medName.isEmpty()) "A Med with no name" else navigationArgs.itemName
-            val newTitle = if (itemId > 0) getString(R.string.edit_fragment_title) else getString(R.string.meds_add_fragment_label)
-            binding.finishButton.setOnClickListener { returnToAdd(newTitle) }
-        } else {
-            lVM.retrieveMed(itemId).observe(this.viewLifecycleOwner) {
-                binding.medName.text = it.name
+        Log.d(DEBUG_TAG, "Entered AddAlarms with ID: $itemId")
+        if (navigationArgs.external) {
+            builderViewModel.clearVM()
+            totalViewModel.retrieveMed(itemId).observe(this.viewLifecycleOwner) {
+                med = it
+                bind(it)
             }
             binding.finishButton.setOnClickListener { returnToDetails() }
+        } else {
+            binding.finishButton.setOnClickListener { returnToAdd() }
         }
-        viewModel.alarmCount.observe(this.viewLifecycleOwner) {
-            binding.alarmsAdapter?.setSize(it)
+
+        //Observe changes to alarmData
+        builderViewModel.alarmData.observe(this.viewLifecycleOwner) {
+            Log.d(DEBUG_TAG, "Change in alarmdate, submitlist")
+            alarmAdapter.submitList(it)
+        }
+
+        binding.buttonAddAlarm.setOnClickListener{
+            TPF(this).show(parentFragmentManager, "New Alarm")
         }
     }
 
-    private fun returnToAdd(newTitle: String) {
+    private fun isValid(): Boolean {
+        val mName = builderViewModel.medName.value?: "Can't find mName"
+        val mDesc = builderViewModel.medDesc.value?: "Can't find mDesc"
+        val sTS = builderViewModel.alarmSetToString()
+
+        Log.d(DEBUG_TAG, "isValid; Name: $mName, Desc: $mDesc, Alarms: $sTS")
+        return totalViewModel.isEntryValid(
+            builderViewModel.medName.value?: "ERROR. CHECK ISVALID",
+            builderViewModel.medDesc.value?: "ERROR. CHECK ISVALID"
+        )
+    }
+
+    //NAV
+    private fun returnToAdd() {
+        val title = if (navigationArgs.itemId > 0) getString(R.string.edit_fragment_title) else getString(R.string.meds_add_fragment_label)
         val action = AddAlarmsFragmentDirections.actionAlarmsAddFragmentToMedsAddFragment(
-            newTitle,
-            navigationArgs.itemId)
+            title = title,
+            itemId = navigationArgs.itemId,
+            external = false)
         findNavController().navigate(action)
     }
-
     private fun returnToDetails() {
-        val action = AddAlarmsFragmentDirections.actionAlarmsAddFragmentToMedsDetailFragment(navigationArgs.itemId)
-        findNavController().navigate(action)
+        if (isValid()){
+            totalViewModel.updateMed(
+                this.navigationArgs.itemId,
+                builderViewModel.medName.value?: "ERROR. Check ReturnToDetails",
+                builderViewModel.medDesc.value?: "ERROR. Check ReturnToDetails",
+                builderViewModel.getAlarmList()
+            )
+            val action = AddAlarmsFragmentDirections.actionAlarmsAddFragmentToMedsDetailFragment(navigationArgs.itemId)
+            findNavController().navigate(action)
+        }
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        viewModel.alarmCount.value = p0?.getItemAtPosition(p2).toString()
-    }
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-        Log.d(DEBUG_TAG, "onNothingSelected in addAlarmsFragment")
-    }
-
-    private val alarmListener: (Int, TimePickerDialog.OnTimeSetListener) -> Unit = { position, onTimeSetListener ->
+    //Handle Comms with viewModel AlarmData
+    //not sure if better to send one complicated listener or multiple small listeners
+    private val timePickerMachine: (Int, OnTimeSetListener) -> Unit = { position, onTimeSetListener ->
         TPF(onTimeSetListener).show(parentFragmentManager, position.toString())
     }
-    private val updateVMAlarmList: (Int, String) -> Unit = {
-            i, str ->
-        Log.d(DEBUG_TAG, "Sending Up!")
-        viewModel.updateAt(i, str)
+
+    private val sendToVM: (Int, String, Int) -> Unit = {
+        position, value, operation ->
+        when(operation) {
+            UPDATE -> builderViewModel.updateAt(position, value)
+            DELETE -> builderViewModel.removeAlarmAt(position, value);
+        }
+    }
+    private val addAlarm: (String) -> Unit = { str ->
+        Log.d(DEBUG_TAG, "Adding an alarm")
+        builderViewModel.addToAlarms(str)
+    }
+    override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
+        String.format("%2d:%02d", p1, p2).also {
+            Log.d(DEBUG_TAG, "Adding alarm $it")
+            addAlarm(it)
+        }
+    }
+
+    //Spinner Fun
+    //    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+//        builderViewModel.alarmCount.value = p0?.getItemAtPosition(p2).toString()
+//    }
+//    override fun onNothingSelected(p0: AdapterView<*>?) {
+//        Log.d(DEBUG_TAG, "onNothingSelected in addAlarmsFragment")
+//    }
+}
+
+class TPF(private val lis: OnTimeSetListener): DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val c = Calendar.getInstance()
+        val hour = c.get(Calendar.HOUR_OF_DAY)
+        val minute = c.get(Calendar.MINUTE)
+
+        return TimePickerDialog(activity, lis, hour, minute, DateFormat.is24HourFormat(activity))
     }
 }

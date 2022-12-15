@@ -8,7 +8,8 @@ import kotlinx.coroutines.launch
 class MedsViewModel(private val medDao: MedDao, ) : ViewModel() {
 
     val userMeds: LiveData<List<Med>> = medDao.getMeds().asLiveData()
-    lateinit var selectedMed: LiveData<Med>
+
+    fun stringToSet(s: String): Set<String> = s.split(";").toSet()
 
     fun updateMed(itemId: Int, itemName: String, itemDesc: String, itemTrackers: String){
         val updatedMed = getUpdatedMedEntry(itemId, itemName, itemDesc, itemTrackers)
@@ -36,8 +37,8 @@ class MedsViewModel(private val medDao: MedDao, ) : ViewModel() {
         }
     }
 
-    fun isEntryValid(medName: String, medDesc: String, medTrackers: String): Boolean {
-        if (medName.isBlank() || medDesc.isBlank() || medTrackers.isBlank()) {
+    fun isEntryValid(medName: String, medDesc: String): Boolean {
+        if (medName.isBlank() || medDesc.isBlank()) {
             return false
         }
         return true

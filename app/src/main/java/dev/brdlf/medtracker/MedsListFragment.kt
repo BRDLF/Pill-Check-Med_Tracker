@@ -35,7 +35,6 @@ class MedsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = MedsListAdapter {
-            viewModel.selectedMed = viewModel.retrieveMed(it.id)
             val action =
                 MedsListFragmentDirections.Companion.actionMedsListFragmentToMedsDetailFragment(it.id)
             findNavController().navigate(action)

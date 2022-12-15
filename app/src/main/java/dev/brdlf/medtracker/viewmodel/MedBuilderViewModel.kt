@@ -48,19 +48,22 @@ class MedBuilderViewModel : ViewModel() {
     fun addToAlarms(insert: String): Boolean{
         Log.d(DEBUG_TAG, "addToAlarms: $insert")
         Log.d(DEBUG_TAG, "Before: ${_alarmData.value} & ${alarmData.value}")
-        _alarmData.value = alarmData.value?.plus(insert)
-//        _alarmData.value?.add(insert)?: Log.d(DEBUG_TAG, "Failed")
+        _alarmData.value = alarmData.value?.plus(insert)?.distinct()
+        sortAlarms()
         Log.d(DEBUG_TAG, "After: ${_alarmData.value} & ${alarmData.value}")
         return true
     }
     fun updateAt(index: Int, new: String) {
         Log.d(DEBUG_TAG, "Running UpdateAt")
-        _alarmData.value = alarmData.value?.mapIndexed{ i, original -> if (i == index) new else original }
-//        _alarmData.value?.set(index, s)?: Log.d(DEBUG_TAG, "Couldn't update at index $index")
+        _alarmData.value = alarmData.value?.mapIndexed{ i, original -> if (i == index) new else original }?.distinct()
+        sortAlarms()
+    }
+    private val myCompare = compareBy<String>({it.split(":").first().toInt()}, {it.split(":").last().toInt()})
+    private fun sortAlarms() {
+        _alarmData.value = alarmData.value?.sortedWith(myCompare)
     }
     fun removeFromAlarms(str: String) {
         _alarmData.value = alarmData.value?.minus(str)
-//        alarmData.value?.remove(str)?: Log.d(DEBUG_TAG, "Couldn't remove $str")
     }
     fun removeAlarmAt(index: Int, str: String) {
         if (alarmData.value?.get(index) == str) {

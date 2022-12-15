@@ -79,7 +79,6 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
         //  Set onClickListener toAdd
 
         //HANDLING SOURCE ACTION
-//        val medName: String? = navigationArgs.itemName
         val itemId = navigationArgs.itemId
         Log.d(DEBUG_TAG, "Entered AddAlarms with ID: $itemId")
         if (navigationArgs.external) {
@@ -140,8 +139,8 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
 
     //Handle Comms with viewModel AlarmData
     //not sure if better to send one complicated listener or multiple small listeners
-    private val timePickerMachine: (Int, OnTimeSetListener) -> Unit = { position, onTimeSetListener ->
-        TPF(onTimeSetListener).show(parentFragmentManager, position.toString())
+    private val timePickerMachine: (Int, Int, Int, OnTimeSetListener) -> Unit = { position, hour, minute, onTimeSetListener ->
+        TPF(onTimeSetListener, hour, minute).show(parentFragmentManager, position.toString())
     }
 
     private val sendToVM: (Int, String, Int) -> Unit = {
@@ -156,8 +155,8 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
         builderViewModel.addToAlarms(str)
     }
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        String.format("%2d:%02d", p1, p2).also {
-            Log.d(DEBUG_TAG, "Adding alarm $it")
+        String.format("%d:%02d", p1, p2).also {
+            Log.d(DEBUG_TAG, "Adding alarm *$it*")
             addAlarm(it)
         }
     }
@@ -171,12 +170,8 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
 //    }
 }
 
-class TPF(private val lis: OnTimeSetListener): DialogFragment() {
+class TPF(private val lis: OnTimeSetListener, private val hour: Int = 0, private val minute: Int = 0): DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val c = Calendar.getInstance()
-        val hour = c.get(Calendar.HOUR_OF_DAY)
-        val minute = c.get(Calendar.MINUTE)
-
         return TimePickerDialog(activity, lis, hour, minute, DateFormat.is24HourFormat(activity))
     }
 }

@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'dev.brdlf.medtracker'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId 'dev.brdlf.pillcheckmedtracker'
-        minSdk 23
-        targetSdk 32
+        minSdk 29
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 

@@ -17,6 +17,8 @@ class AlarmsListAdapter(private val timePickingMachine: (Int, Int, Int, TimePick
 
     class AlarmViewHolder(private val binding: ViewAlarmAddBinding, private val bigListener: (Int, String, Int) -> Unit) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
 
+
+        //TODO: Change the text representation to take into account timeDateSettings
         override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
             String.format("%d:%02d", p1, p2).also {
                 Log.d(DEBUG_TAG, "Edit alarm *$it*")

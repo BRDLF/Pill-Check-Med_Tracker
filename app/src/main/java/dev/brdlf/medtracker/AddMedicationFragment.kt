@@ -14,6 +14,8 @@ import androidx.navigation.fragment.navArgs
 import dev.brdlf.medtracker.databinding.FragmentAddMedsBinding
 import dev.brdlf.medtracker.model.Med
 import dev.brdlf.medtracker.viewmodel.*
+import java.text.DateFormat
+import java.util.*
 
 class AddMedicationFragment : Fragment() {
 
@@ -80,7 +82,11 @@ class AddMedicationFragment : Fragment() {
 
         // Setting Alarms Text
         builderViewModel.alarmData.observe(this.viewLifecycleOwner) {
-            val tempAlarm = builderViewModel.alarmSetToString().replace(";", "\n")
+            val cBuilder: (Pair<Int, Int>) -> Calendar = { a -> Calendar.Builder().set(Calendar.HOUR_OF_DAY, a.first).set(
+                Calendar.MINUTE, a.second).build()}
+            val cToString: (Calendar) -> String = { c -> DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)}
+            val tempAlarm = if (it.isEmpty()) "No alarms to show" else it.joinToString("\n") { that -> cToString(cBuilder(that)) }
+//          builderViewModel.alarmSetToString().replace(";", "\n")
             Log.d(DEBUG_TAG, "Observing med. alarms text being set to $tempAlarm")
             binding.alarmDataText.text = tempAlarm
         }

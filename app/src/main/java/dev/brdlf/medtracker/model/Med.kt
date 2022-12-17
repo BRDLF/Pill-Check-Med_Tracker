@@ -12,10 +12,18 @@ data class Med(
     val alarms: String = ""
     ) {
     fun alarmsFormat(): String {
-//        return alarms.replace(";", "\n")
-        val testString = "EX;10:00;12:00;2:00"
-        val split = alarms.split(";")
-        return split.joinToString("\n")
-//        return "Test Alarm\nTest Alarm 2"
+        return alarms.replace(";","\n")
+    }
+    fun listAlarms(): List<String> {
+        return alarms.split(";")
+    }
+    fun specAlarm(index: Int): String {
+        val list = listAlarms()
+        return if (index in list.indices) list[index]
+            else "ERROR"
+    }
+    fun alarmToTime(alarm: String): Pair<Int, Int> {
+        val (first, second) = alarm.split(":").map{ it.toInt() }
+        return Pair(first, second)
     }
 }

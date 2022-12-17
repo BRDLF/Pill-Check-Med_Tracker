@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.app.TimePickerDialog.OnTimeSetListener
 import android.os.Bundle
-import android.text.format.DateFormat
+import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,6 +18,7 @@ import androidx.navigation.fragment.navArgs
 import dev.brdlf.medtracker.databinding.FragmentAddAlarmsBinding
 import dev.brdlf.medtracker.model.Med
 import dev.brdlf.medtracker.viewmodel.*
+import java.text.DateFormat
 import java.util.*
 
 const val UPDATE = 2
@@ -95,7 +96,9 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
         //Observe changes to alarmData
         builderViewModel.alarmData.observe(this.viewLifecycleOwner) {
             Log.d(DEBUG_TAG, "Change in alarmdate, submitlist")
-            alarmAdapter.submitList(it)
+            //TODO Fix this to properly format string
+
+            alarmAdapter.submitList(it.map{ that -> String.format("%d:%02d", that.first, that.second)})
         }
 
         binding.buttonAddAlarm.setOnClickListener{
@@ -130,21 +133,20 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
                 this.navigationArgs.itemId,
                 builderViewModel.medName.value?: "ERROR. Check ReturnToDetails",
                 builderViewModel.medDesc.value?: "ERROR. Check ReturnToDetails",
-                builderViewModel.getAlarmList()
+                builderViewModel.alarmSetToString()
             )
             val action = AddAlarmsFragmentDirections.actionAlarmsAddFragmentToMedsDetailFragment(navigationArgs.itemId)
             findNavController().navigate(action)
         }
     }
 
-    //Handle Comms with viewModel AlarmData
-    //not sure if better to send one complicated listener or multiple small listeners
     private val timePickerMachine: (Int, Int, Int, OnTimeSetListener) -> Unit = { position, hour, minute, onTimeSetListener ->
         TPF(onTimeSetListener, hour, minute).show(parentFragmentManager, position.toString())
     }
 
     private val sendToVM: (Int, String, Int) -> Unit = {
         position, value, operation ->
+        Log.d(DEBUG_TAG, "Sending to VM pos $position value $value")
         when(operation) {
             UPDATE -> builderViewModel.updateAt(position, value)
             DELETE -> builderViewModel.removeAlarmAt(position, value);
@@ -172,6 +174,6 @@ class AddAlarmsFragment : Fragment(), OnTimeSetListener {
 
 class TPF(private val lis: OnTimeSetListener, private val hour: Int = 0, private val minute: Int = 0): DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return TimePickerDialog(activity, lis, hour, minute, DateFormat.is24HourFormat(activity))
+        return TimePickerDialog(activity, lis, hour, minute, android.text.format.DateFormat.is24HourFormat(activity))
     }
 }

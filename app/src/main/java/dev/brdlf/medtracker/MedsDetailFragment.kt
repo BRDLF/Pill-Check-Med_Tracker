@@ -28,7 +28,7 @@ class MedsDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMedsDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,10 +43,12 @@ class MedsDetailFragment : Fragment() {
     }
 
     private fun bind(med: Med) {
-        binding.thisMed = med
-        binding.editButton.setOnClickListener { editMed() }
-        binding.deleteButton.setOnClickListener{ deleteMed() }
-        binding.alarmButton.setOnClickListener { editAlarms() }
+        binding.apply {
+            thisMed = med
+            editButton.setOnClickListener { editMed() }
+            deleteButton.setOnClickListener{ deleteMed() }
+            alarmButton.setOnClickListener { editAlarms() }
+        }
     }
 
     private fun editMed() {
@@ -61,7 +63,6 @@ class MedsDetailFragment : Fragment() {
         val action = MedsDetailFragmentDirections.actionMedsDetailFragmentToMedsListFragment()
         this.findNavController().navigate(action)
     }
-
     private fun editAlarms() {
         val action = MedsDetailFragmentDirections.actionMedsDetailFragmentToAlarmsAddFragment(itemId = med.id)
         this.findNavController().navigate(action)

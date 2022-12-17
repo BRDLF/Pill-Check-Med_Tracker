@@ -1,7 +1,8 @@
 package dev.brdlf.medtracker.model
 
-import android.text.TextUtils.split
 import androidx.room.*
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.formatToString
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.unwrap
 
 @Entity(tableName = "meds")
 data class Med(
@@ -11,19 +12,7 @@ data class Med(
     val description: String = "",
     val alarms: String = ""
     ) {
-    fun alarmsFormat(): String {
-        return alarms.replace(";","\n")
-    }
-    fun listAlarms(): List<String> {
-        return alarms.split(";")
-    }
-    fun specAlarm(index: Int): String {
-        val list = listAlarms()
-        return if (index in list.indices) list[index]
-            else "ERROR"
-    }
-    fun alarmToTime(alarm: String): Pair<Int, Int> {
-        val (first, second) = alarm.split(":").map{ it.toInt() }
-        return Pair(first, second)
+    fun alarmAsFormattedByLocale(): String {
+        return alarms.unwrap().joinToString("\n") { it.formatToString() }
     }
 }

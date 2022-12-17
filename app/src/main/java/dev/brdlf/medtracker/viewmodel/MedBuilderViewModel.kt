@@ -1,13 +1,11 @@
 package dev.brdlf.medtracker.viewmodel
 
-import android.icu.text.DateFormat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import java.lang.reflect.Array.set
-import java.util.Calendar
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.unwrap
 
 const val DEBUG_TAG = "DEBUG TAG"
 
@@ -16,7 +14,7 @@ class MedBuilderViewModel : ViewModel() {
     val medName: MutableLiveData<String> = MutableLiveData<String>()
     val medDesc: MutableLiveData<String> = MutableLiveData<String>()
 
-    private val _alarmData: MutableLiveData<List<Pair<Int, Int>>> = MutableLiveData(listOf<Pair<Int,Int>>())
+    private val _alarmData: MutableLiveData<List<Pair<Int, Int>>> = MutableLiveData(listOf())
     val alarmData: LiveData<List<Pair<Int,Int>>> get() = _alarmData
 
     fun clearVM(){
@@ -26,49 +24,34 @@ class MedBuilderViewModel : ViewModel() {
     }
 
     //Translate entire data set to/from string
-    fun setAlarmDataFromString(source: String) {
+    //Wrap, Needed only by builderVM
+    private fun List<Pair<Int, Int>>.wrap(): String {
+        return this.joinToString(";") { String.format("%d:%d", it.first, it.second) }
+    }
+    fun wrap(): String {
+//        return getSortedSet().joinToString(";")
+        return alarmData.value?.wrap()?: "ERROR"
+    }
+
+    fun unwrap(source: String) {
         val sortedSource = source.split(";").filterNot{ it.isEmpty() }
-        Log.d(DEBUG_TAG, "In setAlarmFromString, sortedSorce is $sortedSource")
-        setAlarmData(sortedSource)
+        Log.d(DEBUG_TAG, "In setAlarmFromString, sortedSource is $sortedSource")
+        _alarmData.value = source.unwrap()
     }
-    private fun setAlarmData(toAdd :List<String>) {
-        Log.d(DEBUG_TAG, "in setAlarmData, adding $toAdd to ${_alarmData.value}")
-        _alarmData.value = toAdd.map{ stringToPair(it) }
-        Log.d(DEBUG_TAG, "in setAlarmData, alarmData is now ${_alarmData.value}")
-    }
-    fun alarmSetToString(): String {
-        return getSortedSet().joinToString(";")
-    }
-    private fun getSortedSet(): List<String> {
-        return alarmData.value?.map { pairToString(it) }?: listOf("ERROR")
-    }
+
     //Edit Individual Data
-    fun addToAlarms(insert: String): Boolean{
-        Log.d(DEBUG_TAG, "addToAlarms: $insert")
-        Log.d(DEBUG_TAG, "Before: ${_alarmData.value} & ${alarmData.value}")
-        _alarmData.value = alarmData.value?.plus(stringToPair(insert))?.distinct()
+    fun addAlarm(insert: Pair<Int, Int>): Boolean{
+        _alarmData.value = alarmData.value?.plus(insert)?.distinct()?: return false
         sortAlarms()
-        Log.d(DEBUG_TAG, "After: ${_alarmData.value} & ${alarmData.value}")
         return true
     }
-    //TODO tidy this up to take TimeDateFormat
-    private fun pairToString(a: Pair<Int, Int>): String {
-        val c = Calendar.Builder().set(Calendar.HOUR_OF_DAY, a.first).set(Calendar.MINUTE, a.second).build()
-        val cBuilder: (Pair<Int, Int>) -> Calendar = { a -> Calendar.Builder().set(Calendar.HOUR_OF_DAY, a.first).set(Calendar.MINUTE, a.second).build()}
-        val cToString: (Calendar) -> String = {c -> DateFormat.getDateInstance().format(c)}
-        Log.d(DEBUG_TAG, c.toString())
-        return String.format("%d:%02d", a.first, a.second)
-    }
-    private fun stringToPair(s: String): Pair<Int, Int> {
-        return Pair(s.split(":").first().toInt(), s.split(":").last().toInt())
-    }
-    fun updateAt(index: Int, new: String) {
+    fun updateAlarmAt(index: Int, new: Pair<Int, Int>) {
         Log.d(DEBUG_TAG, "Running UpdateAt")
-        _alarmData.value = alarmData.value?.mapIndexed{ i, original -> if (i == index) stringToPair(new) else original }?.distinct()
+        _alarmData.value = alarmData.value?.mapIndexed{ i, original -> if (i == index) new else original }?.distinct()
         sortAlarms()
     }
-    fun removeAlarmAt(index: Int, str: String) {
-        if (alarmData.value?.get(index) == stringToPair(str)) {
+    fun removeAlarmAt(index: Int, str: Pair<Int, Int>) {
+        if (alarmData.value?.get(index) == str) {
             Log.d(DEBUG_TAG, "Removing $str at $index")
             _alarmData.value = alarmData.value?.filterIndexed{i, _ -> i != index}
         }
@@ -78,13 +61,9 @@ class MedBuilderViewModel : ViewModel() {
     private fun sortAlarms() {
         _alarmData.value = alarmData.value?.sortedWith(myCompare)
     }
-    fun removeFromAlarms(str: String) {
-        _alarmData.value = alarmData.value?.minus(stringToPair(str))
-    }
-
 }
 
-class MedBuilderViewModelFactory() : ViewModelProvider.Factory {
+class MedBuilderViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MedBuilderViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

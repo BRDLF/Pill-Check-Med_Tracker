@@ -10,18 +10,19 @@
         android:id="@+id/first_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="textStart"
+        android:layout_gravity="center"
         android:minWidth="64dp"
         android:text="@string/time" />
 
     <!--TODO: Replace with timepicker button-->
-    <Button
-        style="@style/Widget.MaterialComponents.TimePicker.Button"
+    <TextView
         android:id="@+id/time_button"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text = "@string/time_format"
-        android:textColor="#757575" />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:minWidth="64dp"
+        tools:text="HH:mm a"/>
 
     <ImageButton
         android:id="@+id/edit_button"

@@ -11,11 +11,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.formatConsolidate
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.formatToString
 import dev.brdlf.medtracker.databinding.FragmentAddMedsBinding
 import dev.brdlf.medtracker.model.Med
 import dev.brdlf.medtracker.viewmodel.*
-import java.text.DateFormat
-import java.util.*
 
 class AddMedicationFragment : Fragment() {
 
@@ -82,13 +82,9 @@ class AddMedicationFragment : Fragment() {
 
         // Setting Alarms Text
         builderViewModel.alarmData.observe(this.viewLifecycleOwner) {
-            val cBuilder: (Pair<Int, Int>) -> Calendar = { a -> Calendar.Builder().set(Calendar.HOUR_OF_DAY, a.first).set(
-                Calendar.MINUTE, a.second).build()}
-            val cToString: (Calendar) -> String = { c -> DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)}
-            val tempAlarm = if (it.isEmpty()) "No alarms to show" else it.joinToString("\n") { that -> cToString(cBuilder(that)) }
-//          builderViewModel.alarmSetToString().replace(";", "\n")
-            Log.d(DEBUG_TAG, "Observing med. alarms text being set to $tempAlarm")
-            binding.alarmDataText.text = tempAlarm
+            val alarmsText = if (it.isEmpty()) "No alarms to show" else it.formatConsolidate()
+            Log.d(DEBUG_TAG, "Observing med. alarms text being set to $alarmsText")
+            binding.alarmDataText.text = alarmsText
         }
 
         binding.alarmButton.setOnClickListener {
@@ -100,7 +96,7 @@ class AddMedicationFragment : Fragment() {
         Log.d(DEBUG_TAG, "In Bind,")
         binding.inputMedName.setText(med.name)
         binding.inputMedDesc.setText(med.description)
-        builderViewModel.setAlarmDataFromString(med.alarms)
+        builderViewModel.unwrap(med.alarms)
     }
 
     private fun isValid(): Boolean {
@@ -114,7 +110,7 @@ class AddMedicationFragment : Fragment() {
             totalViewModel.addMed(
                 this.binding.inputMedName.text.toString(),
                 this.binding.inputMedDesc.text.toString(),
-                builderViewModel.alarmSetToString(),
+                builderViewModel.wrap(),
             )
             toMedsList()
         }
@@ -125,7 +121,7 @@ class AddMedicationFragment : Fragment() {
                 this.navigationArgs.itemId,
                 this.binding.inputMedName.text.toString(),
                 this.binding.inputMedDesc.text.toString(),
-                builderViewModel.alarmSetToString(),
+                builderViewModel.wrap(),
             )
             toDetailsList()
         }

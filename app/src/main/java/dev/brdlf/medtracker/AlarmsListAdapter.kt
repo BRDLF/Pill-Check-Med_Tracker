@@ -8,33 +8,33 @@ import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dev.brdlf.medtracker.abstractions.AlarmString.Companion.formatToString
 import dev.brdlf.medtracker.databinding.ViewAlarmAddBinding
 import dev.brdlf.medtracker.viewmodel.DEBUG_TAG
 
 class AlarmsListAdapter(private val timePickingMachine: (Int, Int, Int, TimePickerDialog.OnTimeSetListener) -> Unit,
-                        private val bigListener: (Int, String, Int) -> Unit) :
-    ListAdapter<String, AlarmsListAdapter.AlarmViewHolder>(DiffCallback) {
+                        private val bigListener: (Int, Pair<Int, Int>, Int) -> Unit) :
+    ListAdapter<Pair<Int,Int>, AlarmsListAdapter.AlarmViewHolder>(DiffCallback) {
 
-    class AlarmViewHolder(private val binding: ViewAlarmAddBinding, private val bigListener: (Int, String, Int) -> Unit) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
+    class AlarmViewHolder(private val binding: ViewAlarmAddBinding, private val bigListener: (Int, Pair<Int, Int>, Int) -> Unit) : RecyclerView.ViewHolder(binding.root), TimePickerDialog.OnTimeSetListener {
 
-
-        //TODO: Change the text representation to take into account timeDateSettings
         override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-            String.format("%d:%02d", p1, p2).also {
+            Pair(p1, p2).also {
                 Log.d(DEBUG_TAG, "Edit alarm *$it*")
-                binding.timeButton.text = it
                 bigListener(adapterPosition, it, UPDATE)
             }
         }
 
-        fun bind(alarmString: String, clickListener: (Int, Int, Int, TimePickerDialog.OnTimeSetListener) -> Unit, ) {
-            binding.timeButton.text = alarmString
-            binding.editButton.setOnClickListener{
-                val (hour, minute) = binding.timeButton.text.split(":").map{it.toInt()}
-                clickListener(adapterPosition, hour, minute, this)
-            }
-            binding.deleteButton.setOnClickListener {
-                bigListener(adapterPosition, binding.timeButton.text.toString(), DELETE)
+        fun bind(alarmPair: Pair<Int, Int>, clickListener: (Int, Int, Int, TimePickerDialog.OnTimeSetListener) -> Unit, ) {
+            binding.apply {
+                timeButton.text = alarmPair.formatToString()
+                editButton.setOnClickListener{
+                    val (hour, minute) = alarmPair
+                    clickListener(adapterPosition, hour, minute, this@AlarmViewHolder)
+                }
+                deleteButton.setOnClickListener {
+                    bigListener(adapterPosition, alarmPair, DELETE)
+                }
             }
         }
     }
@@ -51,13 +51,13 @@ class AlarmsListAdapter(private val timePickingMachine: (Int, Int, Int, TimePick
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<String>() {
-            override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+        private val DiffCallback = object : DiffUtil.ItemCallback<Pair<Int, Int>>() {
+            override fun areItemsTheSame(oldItem: Pair<Int, Int>, newItem: Pair<Int, Int>): Boolean {
                 return oldItem === newItem
             }
 
-            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-                return oldItem == newItem
+            override fun areContentsTheSame(oldItem: Pair<Int, Int>, newItem: Pair<Int, Int>): Boolean {
+                return oldItem.first == newItem.first && oldItem.second == newItem.second
             }
         }
     }

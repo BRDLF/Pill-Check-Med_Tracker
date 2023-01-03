@@ -8,6 +8,7 @@ class AlarmString {
     companion object {
         //Unwrap
         fun String.unwrap(): List<Pair<Int, Int>> {
+            if (this.isBlank()) return emptyList()
             val individuals = this.split(";")
             val asPair = individuals.map {
                 val (hour, minute) = it.split(":").map { each -> each.toInt() }

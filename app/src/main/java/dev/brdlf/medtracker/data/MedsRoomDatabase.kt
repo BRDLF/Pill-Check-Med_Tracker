@@ -4,9 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import dev.brdlf.medtracker.model.Med
+import dev.brdlf.medtracker.model.*
 
-@Database(entities = [Med::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        Med::class,
+        Alert::class,
+        MedAlertCrossRef::class,
+    ],
+    version = 1,
+    exportSchema = false
+)
 abstract class MedsRoomDatabase : RoomDatabase() {
 
     abstract fun medDao(): MedDao

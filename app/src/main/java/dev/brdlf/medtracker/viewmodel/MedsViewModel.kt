@@ -27,7 +27,7 @@ class MedsViewModel(private val medDao: MedDao, ) : ViewModel() {
     }
     private fun insertMed(med: Med) {
         viewModelScope.launch {
-            medDao.insert(med)
+            medDao.insertMed(med)
         }
     }
 

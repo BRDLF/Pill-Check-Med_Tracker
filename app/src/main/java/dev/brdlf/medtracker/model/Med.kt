@@ -12,7 +12,5 @@ data class Med(
     val description: String = "",
     val alarms: String = ""
     ) {
-    fun alarmAsFormattedByLocale(): String {
-        return alarms.unwrap().joinToString("\n") { it.formatToString() }
-    }
+    fun alarmAsFormattedByLocale(): String = alarms.unwrap().joinToString("\n") { it.formatToString() }
 }
